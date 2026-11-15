@@ -88,6 +88,9 @@ func _on_button_click(btn: Button, is_down: bool):
 @onready var anim_player = $CanvasLayer/AnimationPlayer
 
 func _on_play_pressed():
+    if bgm: 
+      var music_tween = create_tween()
+music_tween.tween_property($BGM, "volume_db", -40.0, 1.0)
 	print("Đang chạy Cutscene chuyển cảnh...")
 	
 	if anim_player:
