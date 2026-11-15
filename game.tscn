@@ -9,9 +9,6 @@
 [ext_resource type="Script" uid="uid://b3sn10odqjnwr" path="res://map.gd" id="8_mars_map"]
 [ext_resource type="Script" uid="uid://kyqc1w7cujor" path="res://world_controller.gd" id="9_world_controller"]
 [ext_resource type="Texture2D" uid="uid://b4yo8e7svedx4" path="res://Character.png" id="10_character"]
-[ext_resource type="Texture2D" uid="uid://dcdods8kwaq16" path="res://Mars/Gemini_Generated_Image_gzufvtgzufvtgzuf-removebg-preview.png" id="10_iotsf"]
-[ext_resource type="Texture2D" uid="uid://co0hlnkqbf6we" path="res://Mars/Gemini_Generated_Image_tcxh7dtcxh7dtcxh-removebg-preview.png" id="11_lc2xo"]
-[ext_resource type="Texture2D" uid="uid://bkj4f5lgydjps" path="res://Mars/Gemini_Generated_Image_fpayx8fpayx8fpay-removebg-preview.png" id="12_lc2xo"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_5utp4"]
 radius = 40.04997
@@ -125,9 +122,6 @@ fuel_container = ExtResource("7_mfdv2")
 [node name="MarsMap" type="Node2D" parent="." unique_id=385865591]
 visible = false
 script = ExtResource("8_mars_map")
-geology_lab_texture = ExtResource("10_iotsf")
-solar_array_texture = ExtResource("11_lc2xo")
-communications_relay_texture = ExtResource("12_lc2xo")
 
 [node name="WorldController" type="Node" parent="." unique_id=1236947192]
 script = ExtResource("9_world_controller")
