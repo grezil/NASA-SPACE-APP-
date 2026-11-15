@@ -5,15 +5,19 @@ extends Node
 
 @export_node_path("Node2D") var room_path: NodePath = ^"../Room"
 @export_node_path("Node2D") var map_path: NodePath = ^"../MarsMap"
+@export_node_path("Node2D") var growing_path: NodePath = ^"../GrowingRoom"
 @export_node_path("CharacterBody2D") var player_path: NodePath = ^"../Player"
 @export var exterior_spawn := Vector2(-1050.0, 300.0)
 
 var _room: Node2D
 var _map: Node2D
+var _growing: Node2D
 var _player: CharacterBody2D
 var _inside_surface := false
+var _inside_growing := false
 var _interior_position := Vector2.ZERO
 var _surface_position := Vector2.ZERO
+var _growing_position := Vector2.ZERO
 var _room_collision_state: Dictionary = {}
 
 
@@ -41,11 +45,17 @@ func _ready() -> void:
 		_map.set_process(false)
 		_map.set_process_unhandled_input(false)
 
+	if _growing != null:
+		_growing.visible = false
+		if _growing.has_method("set_active"):
+			_growing.call("set_active", false)
+
 
 func _resolve_nodes() -> void:
 	# Các NodePath mặc định ../... là đường dẫn đúng từ WorldController lên Game.
 	_room = get_node_or_null(room_path) as Node2D
 	_map = get_node_or_null(map_path) as Node2D
+	_growing = get_node_or_null(growing_path) as Node2D
 	_player = get_node_or_null(player_path) as CharacterBody2D
 
 	# Fallback nếu người dùng đặt các node trong một nhánh con của Game.
@@ -55,6 +65,8 @@ func _resolve_nodes() -> void:
 			_room = scene_root.find_child("Room", true, false) as Node2D
 		if _map == null:
 			_map = scene_root.find_child("MarsMap", true, false) as Node2D
+		if _growing == null:
+			_growing = scene_root.find_child("GrowingRoom", true, false) as Node2D
 		if _player == null:
 			_player = scene_root.find_child("Player", true, false) as CharacterBody2D
 
@@ -66,6 +78,56 @@ func _unhandled_input(event: InputEvent) -> void:
 			return_to_interior()
 		else:
 			enter_exterior()
+		return
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_G:
+		get_viewport().set_input_as_handled()
+		if _inside_growing:
+			return_from_growing()
+		elif not _inside_surface:
+			enter_growing()
+
+
+## Đi vào module trồng cây (10 khay) trong tàu.
+func enter_growing() -> void:
+	if _inside_growing or _inside_surface or _room == null or _growing == null or _player == null:
+		return
+	_growing_position = _player.global_position
+	_player.velocity = Vector2.ZERO
+
+	_room.visible = false
+	_room.set_process(false)
+	_room.set_process_unhandled_input(false)
+	_set_room_collisions_enabled(false)
+
+	_growing.visible = true
+	if _growing.has_method("set_active"):
+		_growing.call("set_active", true)
+	_player.global_position = _growing.global_position + Vector2(_growing.call("spawn_point"))
+	_inside_growing = true
+	var camera := get_viewport().get_camera_2d()
+	if camera != null:
+		camera.reset_smoothing()
+
+
+## Quay lại khoang chính từ module trồng cây.
+func return_from_growing() -> void:
+	if not _inside_growing or _room == null or _growing == null or _player == null:
+		return
+	if _growing.has_method("set_active"):
+		_growing.call("set_active", false)
+	_growing.visible = false
+	_inside_growing = false
+
+	_room.visible = true
+	_room.set_process(true)
+	_room.set_process_unhandled_input(true)
+	_set_room_collisions_enabled(true)
+	_player.global_position = _growing_position
+	var camera := get_viewport().get_camera_2d()
+	if camera != null:
+		camera.reset_smoothing()
+	if _room.has_method("_limit_camera"):
+		_room.call_deferred("_limit_camera")
 
 
 ## F6: đi từ nội thất ra bề mặt để kiểm thử.
@@ -133,6 +195,10 @@ func return_to_interior() -> void:
 
 func is_on_surface() -> bool:
 	return _inside_surface
+
+
+func is_in_growing() -> bool:
+	return _inside_growing
 
 
 func _set_room_collisions_enabled(enabled: bool) -> void:

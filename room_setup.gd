@@ -100,6 +100,7 @@ func _ready() -> void:
 
 	_build_background()
 	_build_walls()
+	_build_growing_door()
 
 	# _add_device(ảnh, tên, hồi HP, hồi FOOD, chữ khi dùng, thời gian chờ, danh sách vật phẩm, chữ khi không cần)
 	_add_device(computer, "Máy tính", 0.0, 0.0, "Máy tính đang hoạt động", 2.0, [], "")
@@ -290,6 +291,16 @@ func _build_walls() -> void:
 	poly.polygon = pts
 	body.add_child(poly)
 	add_child(body)
+
+
+## Cửa sang module trồng cây: đặt ở giữa bức tường dưới của khoang chính.
+func _build_growing_door() -> void:
+	var door := Node2D.new()
+	door.name = "GrowingDoor"
+	door.set_script(preload("res://growing_door.gd"))
+	door.position = _origin + Vector2(_bg_size.x * 0.85, _bg_size.y * 0.70) * _scale
+	door.set("door_size", Vector2(96.0, 72.0))
+	add_child(door)
 
 
 func _add_device(tex: Texture2D, dname: String, heal: float, food: float, msg: String,

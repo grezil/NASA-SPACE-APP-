@@ -9,6 +9,7 @@
 [ext_resource type="Script" uid="uid://b3sn10odqjnwr" path="res://map.gd" id="8_mars_map"]
 [ext_resource type="Script" uid="uid://kyqc1w7cujor" path="res://world_controller.gd" id="9_world_controller"]
 [ext_resource type="Texture2D" uid="uid://b4yo8e7svedx4" path="res://Character.png" id="10_character"]
+[ext_resource type="Script" path="res://growing_room.gd" id="13_growing"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_5utp4"]
 radius = 40.04997
@@ -125,3 +126,7 @@ script = ExtResource("8_mars_map")
 
 [node name="WorldController" type="Node" parent="." unique_id=1236947192]
 script = ExtResource("9_world_controller")
+
+[node name="GrowingRoom" type="Node2D" parent="."]
+visible = false
+script = ExtResource("13_growing")

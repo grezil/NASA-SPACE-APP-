@@ -26,6 +26,9 @@ Repo này là bản hợp nhất của `grezil/NASA-SPACE-APP-` (nhánh main) v�
 | `Esc` | Đóng bảng, đóng briefing |
 | `Q` | Bật/tắt chế độ tiết kiệm (ít điện, ít oxy hơn) |
 | `T` (giữ) | Tua nhanh thời gian x8 |
+| `E` tại cửa **MODULE TRỒNG CÂY** | Vào khoang trồng cây (10 khay) |
+| `G` | Vào/ra khoang trồng cây (phím tắt) |
+| `F6` | Ra/vào bề mặt Sao Hỏa (để kiểm thử) |
 
 Mẹo: lúc mới vào có bảng **briefing Sol** và game tạm dừng — bấm `Esc` để chơi.
 
@@ -38,18 +41,28 @@ game.tscn                  scene chơi chính: Player, HUD (HP/FOOD), Room, Mars
   player.gd                di chuyển, sinh tồn, clamp trong room_bounds
   room_setup.gd            dựng nền/tường + 3 loại thiết bị, gắn SolSystem
   sol_system.gd            vòng chơi Sol, nhiệm vụ, nhà kính, mini-game, UI phải
-  map.gd                   bản đồ Sao Hỏa (điểm tương tác EVA)
+  map.gd                   bản đồ Sao Hỏa (3 điểm tương tác EVA)
+growing_room.gd          khoang trồng cây trong tàu: 10 khay 2x5, trồng/tưới/thu hoạch
+growing_door.gd          cửa từ khoang chính sang module trồng cây
   world_controller.gd      chuyển giữa trong căn cứ và ngoài bề mặt
 Global.gd                  autoload: HP/Food, oxy/nước/điện/fuel/credits, inventory, beds, save/load
 GameData.gd                bảng dữ liệu cây trồng và vật phẩm
 HUD.gd + greenhouse.tscn   scene nhà kính cũ của main (chạy độc lập được, không nối từ menu)
 assets/                    ảnh cây trồng, vật phẩm, nền nhà kính
+assets/mars/               Mars_Background, Geology_Lab, Solar_Array, Communications_Relay
+assets/bg/greenhouse_growing.png   nền khoang trồng cây (1280x640, 10 ô đất)
 ```
 
 ## Ghi chú
 
-- **Ảnh bản đồ Sao Hỏa chưa có trong repo**: `map.gd` dò `res://assets/mars/*.png`
-  và tự vẽ placeholder nếu thiếu. Thả ảnh vào đó là map có hình ngay.
+- **Bản đồ Sao Hỏa** đã có đủ ảnh trong `assets/mars/`; `map.gd` tự dò theo tên
+  (`Mars_Background.png`, `Geology_Lab.png`, `Solar_Array.png`,
+  `Communications_Relay.png`) nên chỉ cần thay file là đổi hình.
+- **Khoang trồng cây** (`growing_room.gd`): 10 khay khớp 10 ô đất trong ảnh nền.
+  Cây lớn theo thời gian thực, nhả oxy (dùng chung `Global.tick_beds`), tưới tốn
+  6 nước/bồn, thu hoạch vào túi — cùng logic với scene nhà kính cũ.
+- Mars map có 3 điểm: **Geology Lab** (phân tích mẫu → báo cáo), **Solar Array**
+  (vệ sinh pin khi bụi), **NASA Data Relay** (gửi báo cáo → +Power, +khoa học, +điểm).
 - `greenhouse.tscn` (bản main cũ) vẫn chạy được bằng `godot --path . res://greenhouse.tscn`
   nhưng nội dung nhà kính hiện tại nằm trong `sol_system.gd`.
 - Nhạc: "Dub Hub" — Jimmy Fontanez (no copyright 8-bit music), phát lặp qua autoload
