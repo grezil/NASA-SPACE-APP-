@@ -22,7 +22,10 @@ Music="*res://Music.gd"
 
 [display]
 
+window/size/viewport_width=1152
+window/size/viewport_height=648
 window/stretch/mode="viewport"
+window/stretch/aspect="keep"
 
 [physics]
 
