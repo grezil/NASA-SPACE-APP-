@@ -1,10 +1,13 @@
 extends Node2D
 ## Interactable machine: the ship computer (shop), the oxygen concentrator
 ## and the fuel tank. Drawn procedurally so it matches the grow beds.
+##
+## Machines are walk-up props with no collision body: the room's lanes are only
+## a little wider than the player, so a solid footprint here would wedge the
+## player against a wall or seal the passage next to the beds.
 
 var kind: String = "computer"
 var label: Label
-var body: StaticBody2D
 var _w := 90.0
 var _h := 90.0
 var _bar_ratio := 0.0
@@ -35,23 +38,8 @@ func setup(machine_kind: String) -> void:
 	label.size = Vector2(_w + 16, 20)
 	add_child(label)
 
-	add_collision()
 	refresh()
 	set_process(kind != "computer")
-
-func add_collision() -> void:
-	# Only real, floor-standing hardware blocks the player.
-	if kind == "computer":
-		return
-	body = StaticBody2D.new()
-	body.name = "Body"
-	var cs := CollisionShape2D.new()
-	var rs := RectangleShape2D.new()
-	rs.size = Vector2(maxf(_w * 0.8, 46.0), 26.0)
-	cs.shape = rs
-	cs.position = Vector2(0, -rs.size.y * 0.5)
-	body.add_child(cs)
-	add_child(body)
 
 func prompt() -> String:
 	match kind:

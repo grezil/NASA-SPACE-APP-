@@ -12,19 +12,28 @@ const BED_POSITIONS := [
 	Vector2(-350, 110), Vector2(-350, 260),
 	Vector2(390, 60), Vector2(390, 220),
 ]
+# Machine placement: the beds, the central tank and the walls leave lanes only
+# 44-58 px wider than the player, so the machines stand on open floor and do
+# not carry a collision body (see Machine.gd) - they must never wall off a lane.
 const COMPUTER_POS := Vector2(-300, -18)
-const OXYGEN_POS := Vector2(150, 350)
-const FUEL_POS := Vector2(-150, 350)
+const OXYGEN_POS := Vector2(490, 320)
+const FUEL_POS := Vector2(-450, 330)
 
-# Solid furniture painted into the background (world coordinates).
+# Solid scenery: painted room walls plus the furniture (world coordinates).
 const PROP_COLLIDERS := [
-	Rect2(-517, -234, 432, 200),   # workbench / desk with monitors
-	Rect2(-797, -178, 144, 248),   # left wall unit
-	Rect2(-797, 118, 200, 272),    # bottom-left console
-	Rect2(-221, -10, 448, 290),    # central hydroponics tank
-	Rect2(523, -66, 168, 136),     # right console
-	Rect2(587, 118, 160, 144),     # right cabinet
-	Rect2(603, 102, 160, 288),     # bottom-right console
+	# Room shell (the art has walls above the floor that must block).
+	Rect2(-837, -410, 1674, 268),   # back wall band above the floor
+	Rect2(-837, -410, 74, 820),     # left wall column
+	Rect2(763, -410, 74, 820),      # right wall column
+	Rect2(-837, 386, 1674, 24),     # bottom wall base
+	# Furniture.
+	Rect2(-517, -234, 432, 200),    # workbench / desk with monitors
+	Rect2(-797, -178, 144, 248),    # left wall unit
+	Rect2(-797, 118, 200, 272),     # bottom-left console
+	Rect2(-221, -10, 448, 300),     # central hydroponics tank
+	Rect2(523, -66, 168, 136),      # right console
+	Rect2(587, 118, 160, 144),      # right cabinet
+	Rect2(603, 102, 160, 288),      # bottom-right console
 ]
 
 const O2_BREATH_DRAIN := 1.0
@@ -172,6 +181,8 @@ func _build_player() -> void:
 		spawn = Global.player_position
 	player.position = spawn
 	player.z_index = 5
+	# Hard limit: even a physics push-out can never leave the room.
+	player.room_bounds = Rect2(-ROOM_HALF, ROOM_HALF * 2.0)
 	add_child(player)
 	player.died.connect(_on_player_died)
 

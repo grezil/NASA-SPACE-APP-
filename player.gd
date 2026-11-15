@@ -3,6 +3,8 @@ extends CharacterBody2D
 ## HUD (CanvasLayer) and a Camera2D sibling.
 
 @export var speed: float = 180.0
+## Optional level rectangle (world space); the body is clamped inside it.
+@export var room_bounds: Rect2 = Rect2()
 
 # --- Food (hunger) & HP ---
 @export var max_hp: float = 100.0
@@ -59,10 +61,16 @@ func _physics_process(_delta: float) -> void:
 	var input_direction := Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
 	velocity = input_direction * speed
 	move_and_slide()
+	_clamp_to_room()
 
 	if camera:
 		var target := sprite.global_position if sprite else global_position
 		camera.global_position = target
+
+func _clamp_to_room() -> void:
+	if room_bounds.size.x <= 0.0 or room_bounds.size.y <= 0.0:
+		return
+	global_position = global_position.clamp(room_bounds.position, room_bounds.end)
 
 func _process(delta: float) -> void:
 	if _dead or Global.ui_open:
