@@ -9,9 +9,18 @@ extends Control
 @onready var selector = get_node_or_null("Selector")
 @onready var fade_overlay = get_node_or_null("FadeOverlay")
 
+@onready var credit_screen = get_node_or_null("CanvasLayer/CreditScreen")
+@onready var credits_text = get_node_or_null("CanvasLayer/CreditScreen/CreditsText")
+
 var selector_tween: Tween
+var is_rolling_credits: bool = false
+var credit_speed: float = 65.0 # Tốc độ chữ chạy (pixel/giây)
 
 func _ready():
+	# Ẩn màn hình Credit lúc mới mở game
+	if credit_screen:
+		credit_screen.visible = false
+
 	# 1. Kết nối sự kiện Click nút
 	if play_btn: play_btn.pressed.connect(_on_play_pressed)
 	if save_btn: save_btn.pressed.connect(_on_save_pressed)
@@ -30,8 +39,17 @@ func _ready():
 	# 3. Khởi chạy hiệu ứng nhấp nhô tiêu đề
 	start_title_floating()
 
-	# 4. Nhạc nền do autoload Music lo (phát xuyên scene)
-	Music.menu_music()
+	# 4. Nhạc nền menu (tự tạo AudioStreamPlayer nếu scene chưa có)
+	_ensure_bgm()
+
+func _process(delta):
+	if is_rolling_credits and credits_text and credit_screen:
+		# Chữ trượt từ trên xuống dưới
+		credits_text.position.y += credit_speed * delta
+		
+		# Tự động tắt khi dòng cuối cùng trôi qua hết đáy màn hình
+		if credits_text.position.y > credit_screen.size.y:
+			close_credits()
 
 # --- HIỆU ỨNG TIÊU ĐỀ LƠ LỬNG ---
 func start_title_floating():
@@ -90,9 +108,35 @@ func _on_button_click(btn: Button, is_down: bool):
 # --- CHỨC NĂNG CÁC NÚT BẤM ---
 @onready var anim_player = $CanvasLayer/AnimationPlayer
 
+const MUSIC_PATH := "res://Jimmy Fontanez - Dub Hub ♫ NO COPYRIGHT 8-bit Music.mp3"
+
+var bgm: AudioStreamPlayer
+
+## Menu music: reuse a BGM/AudioStreamPlayer node in the scene, or create one.
+func _ensure_bgm() -> AudioStreamPlayer:
+	if bgm != null and is_instance_valid(bgm):
+		return bgm
+	bgm = get_node_or_null("BGM") as AudioStreamPlayer
+	if bgm == null:
+		bgm = find_child("BGM", true, false) as AudioStreamPlayer
+	if bgm == null:
+		bgm = get_node_or_null("CanvasLayer/BGM") as AudioStreamPlayer
+	if bgm == null:
+		bgm = AudioStreamPlayer.new()
+		bgm.name = "BGM"
+		if ResourceLoader.exists(MUSIC_PATH):
+			bgm.stream = load(MUSIC_PATH) as AudioStream
+		bgm.volume_db = -8.0
+		add_child(bgm)
+	if bgm.stream != null and not bgm.playing:
+		bgm.play()
+	return bgm
+
 func _on_play_pressed():
-	# Music keeps playing into the game, just a bit quieter than in the menu.
-	Music.game_music()
+	var music := _ensure_bgm()
+	if music != null and music.playing:
+		var music_tween := create_tween()
+		music_tween.tween_property(music, "volume_db", -40.0, 1.0)
 	print("Đang chạy Cutscene chuyển cảnh...")
 	
 	if anim_player:
@@ -113,4 +157,23 @@ func _on_save_pressed():
 	print("Game saved.")
 
 func _on_credits_pressed():
-	print("Mở thông tin Credits")
+	if not credit_screen or not credits_text: return
+	
+	hide_selector()
+	credits_text.position.y = -1000.0
+	credit_screen.visible = true
+	
+	# Chờ 1 frame để lấy đúng chiều cao khối chữ và tránh nhận nhầm cú click mở nút
+	await get_tree().process_frame
+	credits_text.position.y = -credits_text.size.y
+	is_rolling_credits = true
+
+func _input(event):
+	if is_rolling_credits:
+		if event.is_action_pressed("ui_cancel") or (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT):
+			close_credits()
+
+func close_credits():
+	is_rolling_credits = false
+	if credit_screen:
+		credit_screen.visible = false

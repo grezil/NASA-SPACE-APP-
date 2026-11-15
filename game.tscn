@@ -9,7 +9,7 @@
 [ext_resource type="Script" uid="uid://b3sn10odqjnwr" path="res://map.gd" id="8_mars_map"]
 [ext_resource type="Script" uid="uid://kyqc1w7cujor" path="res://world_controller.gd" id="9_world_controller"]
 [ext_resource type="Texture2D" uid="uid://b4yo8e7svedx4" path="res://Character.png" id="10_character"]
-[ext_resource type="Script" path="res://growing_room.gd" id="13_growing"]
+[ext_resource type="AudioStream" uid="uid://bn8mefochxqfp" path="res://8-Bit Fantasy & Adventure Music.mp3" id="10_hve3p"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_5utp4"]
 radius = 40.04997
@@ -58,11 +58,12 @@ corner_radius_bottom_left = 5
 script = ExtResource("2_e2o6t")
 
 [node name="Sprite2D" type="Sprite2D" parent="Player" unique_id=229687593]
-position = Vector2(4.925, -20.575)
-scale = Vector2(0.18742204, 0.16734104)
+position = Vector2(0.50000095, -31.575003)
+scale = Vector2(0.20582119, 0.20973024)
 texture = ExtResource("10_character")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Player" unique_id=1174978447]
+position = Vector2(-10, -4)
 shape = SubResource("CircleShape2D_5utp4")
 
 [node name="Camera2D" type="Camera2D" parent="Player" unique_id=1088402511]
@@ -121,12 +122,11 @@ food_station = ExtResource("6_eow3j")
 fuel_container = ExtResource("7_mfdv2")
 
 [node name="MarsMap" type="Node2D" parent="." unique_id=385865591]
-visible = false
 script = ExtResource("8_mars_map")
 
 [node name="WorldController" type="Node" parent="." unique_id=1236947192]
 script = ExtResource("9_world_controller")
 
-[node name="GrowingRoom" type="Node2D" parent="."]
-visible = false
-script = ExtResource("13_growing")
+[node name="BGMPlayer" type="AudioStreamPlayer2D" parent="." unique_id=2103919870]
+stream = ExtResource("10_hve3p")
+autoplay = true

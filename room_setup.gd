@@ -100,7 +100,6 @@ func _ready() -> void:
 
 	_build_background()
 	_build_walls()
-	_build_growing_door()
 
 	# _add_device(ảnh, tên, hồi HP, hồi FOOD, chữ khi dùng, thời gian chờ, danh sách vật phẩm, chữ khi không cần)
 	_add_device(computer, "Máy tính", 0.0, 0.0, "Máy tính đang hoạt động", 2.0, [], "")
@@ -147,11 +146,6 @@ func _process(_delta: float) -> void:
 				best_score = score
 				best = d
 
-	# Cửa (airlock / module trồng cây) được ưu tiên: đứng ở cửa thì không chọn thiết bị,
-	# tránh chuyện bấm E bị máy tính nuốt mất.
-	if best != null and _door_near():
-		best = null
-
 	_focused = best
 	for d in _devices:
 		d.focused = (d == best)
@@ -164,14 +158,6 @@ func _process(_delta: float) -> void:
 			var mark := "   <== ĐANG CHỌN" if d == best else ""
 			lines.append("  %s: cách %d px%s" % [d.device_name, int(d.distance_to(p)), mark])
 		_set_debug("\n".join(lines))
-
-
-## Có cửa nào đang trong tầm bấm E của người chơi không?
-func _door_near() -> bool:
-	for child in get_children():
-		if child.has_method("is_player_near") and bool(child.call("is_player_near")):
-			return true
-	return false
 
 
 func _find_player() -> Node2D:
@@ -203,7 +189,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			_debug_canvas.visible = debug_overlay
 			_debug_canvas.queue_redraw()
 		return
-	if event.is_action_pressed("interact") and _focused != null and _player != null and not _door_near():
+	if event.is_action_pressed("interact") and _focused != null and _player != null:
 		_focused.interact(_player)
 
 
@@ -304,28 +290,6 @@ func _build_walls() -> void:
 	poly.polygon = pts
 	body.add_child(poly)
 	add_child(body)
-
-
-## Hai cửa của khoang chính: module trồng cây (phải) và airlock ra Sao Hỏa (trái).
-func _build_growing_door() -> void:
-	var door := Node2D.new()
-	door.name = "GrowingDoor"
-	door.set_script(preload("res://growing_door.gd"))
-	door.position = _origin + Vector2(_bg_size.x * 0.85, _bg_size.y * 0.70) * _scale
-	door.set("door_size", Vector2(96.0, 72.0))
-	door.set("label_text", "MODULE TRỒNG CÂY")
-	door.set("target_method", "enter_growing")
-	add_child(door)
-
-	var airlock := Node2D.new()
-	airlock.name = "AirlockDoor"
-	airlock.set_script(preload("res://growing_door.gd"))
-	airlock.position = _origin + Vector2(_bg_size.x * 0.075, _bg_size.y * 0.44) * _scale
-	airlock.set("door_size", Vector2(76.0, 92.0))
-	airlock.set("label_text", "AIRLOCK: RA SAO HỎA")
-	airlock.set("target_method", "enter_exterior")
-	airlock.set("accent", Color(1.0, 0.72, 0.3))
-	add_child(airlock)
 
 
 func _add_device(tex: Texture2D, dname: String, heal: float, food: float, msg: String,

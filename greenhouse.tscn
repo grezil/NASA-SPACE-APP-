@@ -1,6 +1,6 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://ccdoqeyxbbve6"]
 
-[ext_resource type="Script" path="res://greenhouse.gd" id="1_greenhouse"]
+[ext_resource type="Script" uid="uid://3il4jew3vsl3" path="res://greenhouse.gd" id="1_greenhouse"]
 
-[node name="Greenhouse" type="Node2D"]
+[node name="Greenhouse" type="Node2D" unique_id=1285357458]
 script = ExtResource("1_greenhouse")

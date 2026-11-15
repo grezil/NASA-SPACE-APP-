@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://bn8mefochxqfp"
+path="res://.godot/imported/8-Bit Fantasy & Adventure Music.mp3-249ace7b484533dad87e2f20bb189fef.mp3str"
+
+[deps]
+
+source_file="res://8-Bit Fantasy & Adventure Music.mp3"
+dest_files=["res://.godot/imported/8-Bit Fantasy & Adventure Music.mp3-249ace7b484533dad87e2f20bb189fef.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

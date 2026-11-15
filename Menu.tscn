@@ -5,6 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://dsmenfsidka26" path="res://Title-removebg-preview.png" id="3_cx167"]
 [ext_resource type="FontFile" uid="uid://dkc7av0562gln" path="res://Silkscreen-Bold.ttf" id="3_ylpcl"]
 [ext_resource type="Shader" uid="uid://dqts41rxgmtj7" path="res://Menu.gdshader" id="5_dolsu"]
+[ext_resource type="AudioStream" uid="uid://bgnm0xwuktosl" path="res://Jimmy Fontanez - Dub Hub ♫ NO COPYRIGHT 8-bit Music.mp3" id="6_n4eug"]
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_5utp4"]
 particle_flag_disable_z = true
@@ -167,15 +168,67 @@ color = Color(0, 0, 0, 1)
 [node name="AnimationPlayer" type="AnimationPlayer" parent="CanvasLayer" unique_id=982960509]
 libraries/ = SubResource("AnimationLibrary_n4eug")
 
+[node name="CreditScreen" type="ColorRect" parent="CanvasLayer" unique_id=1705324968]
+visible = false
+clip_contents = true
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 14.0
+offset_top = -3.0
+offset_right = 14.0
+offset_bottom = -3.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="CreditsText" type="Label" parent="CanvasLayer/CreditScreen" unique_id=1220129754]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -675.5
+offset_right = 675.5
+offset_bottom = 643.0
+grow_horizontal = 2
+theme_override_fonts/font = ExtResource("3_ylpcl")
+text = "JUNIOR ASTRONAUT
+MISSION TRAINER
+
+
+--- TEAM 5JOBLESS ---
+
+VO QUANG NHAT NGUYEN
+
+NGUYEN DUC ANH
+
+NGUYEN KHANG SINH
+
+NGUYEN TAN HUNG
+
+TRAN DINH KHANH DUY
+
+
+--- MUSIC ---
+DUB HUB - JIMMY FONTANEZ
+
+
+--- ENGINE ---
+GODOT 4
+
+
+THANK YOU FOR PLAYING!"
+horizontal_alignment = 1
+
 [node name="CRT_Overlay" type="ColorRect" parent="CanvasLayer" unique_id=511075441]
 material = SubResource("ShaderMaterial_jnk7r")
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -266.0
-offset_top = -101.0
-offset_right = 382.0
-offset_bottom = 151.0
+offset_left = -293.0
+offset_top = -154.0
+offset_right = 520.0
+offset_bottom = 146.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
@@ -192,4 +245,8 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 6
 theme_override_fonts/font = ExtResource("3_ylpcl")
 theme_override_font_sizes/font_size = 21
-text = "Made by 4joblesS"
+text = "Made by 5joblesS"
+
+[node name="BGM" type="AudioStreamPlayer2D" parent="." unique_id=308995357]
+stream = ExtResource("6_n4eug")
+autoplay = true

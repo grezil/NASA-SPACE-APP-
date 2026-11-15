@@ -10,7 +10,7 @@ signal location_interacted(location_id: String)
 
 @export_group("Kích thước bản đồ")
 @export var map_width := 2400.0
-@export var map_height := 883.0   # khớp tỉ lệ ảnh Mars_Background (3392x1248)
+@export var map_height := 900.0
 @export var build_boundary_collisions := true
 @export var apply_camera_limits := true
 
@@ -29,11 +29,11 @@ signal location_interacted(location_id: String)
 
 @export_group("Vị trí và kích thước")
 @export var geology_lab_sprite_position := Vector2(-420.0, -35.0)
-@export var geology_lab_sprite_size := Vector2(262.0, 262.0)   # Searching Machine.png (1:1)
-@export var solar_array_sprite_position := Vector2(300.0, -150.0)
-@export var solar_array_sprite_size := Vector2(360.0, 241.0)   # SolarPanel.png (610x409)
+@export var geology_lab_sprite_size := Vector2(300.0, 190.0)
+@export var solar_array_sprite_position := Vector2(180.0, -220.0)
+@export var solar_array_sprite_size := Vector2(360.0, 210.0)
 @export var communications_relay_sprite_position := Vector2(820.0, 75.0)
-@export var communications_relay_sprite_size := Vector2(238.0, 238.0)   # Radio.png (1:1)
+@export var communications_relay_sprite_size := Vector2(210.0, 230.0)
 
 const GROUND := Color(0.43, 0.25, 0.18, 1.0)
 const GROUND_DARK := Color(0.31, 0.18, 0.14, 1.0)
@@ -200,17 +200,9 @@ func _build_points() -> void:
 			"id": "solar_cleaning",
 			"name": "Solar Array / Vệ sinh pin",
 			"hint": "Lau bụi để phục hồi hiệu suất phát điện",
-			"position": Vector2(300.0, 20.0),
+			"position": Vector2(180.0, -65.0),
 			"radius": 150.0,
 			"action": "_clean_mars_solar_panels",
-		},
-		{
-			"id": "airlock",
-			"name": "Airlock / Về căn cứ",
-			"hint": "Vào lại khoang chính để nạp lại suit và oxy",
-			"position": Vector2(-900.0, 250.0),
-			"radius": 160.0,
-			"action": "_return_to_base_from_eva",
 		},
 		{
 			"id": "nasa_relay",

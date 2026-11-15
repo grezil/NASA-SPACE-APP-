@@ -12,8 +12,6 @@ const MAX_OXYGEN := 100.0
 const MAX_WATER := 100.0
 const MAX_POWER := 100.0
 const MAX_FUEL := 100.0
-## Số khay trồng: 10 khay trong module trồng cây (2x5).
-const BEDS_COUNT := 10
 
 # --- Player vitals -----------------------------------------------------------
 var player_hp: float = 100.0
@@ -65,7 +63,7 @@ func new_game() -> void:
 		"seed_basil": 2,
 	}
 	beds = []
-	for i in BEDS_COUNT:
+	for i in 6:
 		beds.append(_empty_bed())
 	saved_at = int(Time.get_unix_time_from_system())
 
@@ -251,7 +249,7 @@ func load_game() -> bool:
 
 	inventory = cfg.get_value("inventory", "items", {})
 	beds = cfg.get_value("beds", "list", [])
-	while beds.size() < BEDS_COUNT:
+	while beds.size() < 6:
 		beds.append(_empty_bed())
 
 	saved_at = int(cfg.get_value("meta", "saved_at", 0))
