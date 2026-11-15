@@ -32,7 +32,8 @@ Mẹo: lúc mới vào có bảng **briefing Sol** và game tạm dừng — b�
 ## Cấu trúc
 
 ```
-Menu.tscn / node_2d.gd     menu chính (PLAY, SAVE GAME, CREDIT) + nhạc nền
+Menu.tscn / node_2d.gd     menu chính (PLAY, SAVE GAME, CREDIT)
+Music.gd                   autoload nhạc nền: phát từ menu và tiếp tục trong game
 game.tscn                  scene chơi chính: Player, HUD (HP/FOOD), Room, MarsMap
   player.gd                di chuyển, sinh tồn, clamp trong room_bounds
   room_setup.gd            dựng nền/tường + 3 loại thiết bị, gắn SolSystem
@@ -51,5 +52,7 @@ assets/                    ảnh cây trồng, vật phẩm, nền nhà kính
   và tự vẽ placeholder nếu thiếu. Thả ảnh vào đó là map có hình ngay.
 - `greenhouse.tscn` (bản main cũ) vẫn chạy được bằng `godot --path . res://greenhouse.tscn`
   nhưng nội dung nhà kính hiện tại nằm trong `sol_system.gd`.
-- Nhạc: "Dub Hub" — Jimmy Fontanez (no copyright 8-bit music).
+- Nhạc: "Dub Hub" — Jimmy Fontanez (no copyright 8-bit music), phát lặp qua autoload
+  `Music.gd` (menu −8 dB, trong game −14 dB). Nếu không nghe thấy: kiểm tra Windows
+  Volume Mixer cho `Godot`/`4joblesS` và đảm bảo chạy từ `Menu.tscn` (F5).
 - Thiết kế chi tiết: [docs/gameplay-plan.md](docs/gameplay-plan.md).

@@ -30,8 +30,8 @@ func _ready():
 	# 3. Khởi chạy hiệu ứng nhấp nhô tiêu đề
 	start_title_floating()
 
-	# 4. Nhạc nền menu (tự tạo AudioStreamPlayer nếu scene chưa có)
-	_ensure_bgm()
+	# 4. Nhạc nền do autoload Music lo (phát xuyên scene)
+	Music.menu_music()
 
 # --- HIỆU ỨNG TIÊU ĐỀ LƠ LỬNG ---
 func start_title_floating():
@@ -90,52 +90,9 @@ func _on_button_click(btn: Button, is_down: bool):
 # --- CHỨC NĂNG CÁC NÚT BẤM ---
 @onready var anim_player = $CanvasLayer/AnimationPlayer
 
-const MUSIC_PATH := "res://Jimmy Fontanez - Dub Hub ♫ NO COPYRIGHT 8-bit Music.mp3"
-const MUSIC_VOLUME_DB := -8.0
-
-var bgm: AudioStreamPlayer
-var _music_tween: Tween
-
-## Fade the menu music to a target volume (kills any fade still running).
-func _fade_music(target_db: float, duration: float) -> void:
-	if bgm == null or not is_instance_valid(bgm):
-		return
-	if _music_tween != null and _music_tween.is_valid():
-		_music_tween.kill()
-	_music_tween = create_tween()
-	_music_tween.tween_property(bgm, "volume_db", target_db, duration)
-
-## Menu music: reuse a BGM/AudioStreamPlayer node in the scene, or create one.
-func _ensure_bgm() -> AudioStreamPlayer:
-	if bgm != null and is_instance_valid(bgm):
-		return bgm
-	bgm = get_node_or_null("BGM") as AudioStreamPlayer
-	if bgm == null:
-		bgm = find_child("BGM", true, false) as AudioStreamPlayer
-	if bgm == null:
-		bgm = get_node_or_null("CanvasLayer/BGM") as AudioStreamPlayer
-	if bgm == null:
-		bgm = AudioStreamPlayer.new()
-		bgm.name = "BGM"
-		if ResourceLoader.exists(MUSIC_PATH):
-			bgm.stream = load(MUSIC_PATH) as AudioStream
-		bgm.volume_db = MUSIC_VOLUME_DB
-		add_child(bgm)
-	# Loop the menu track even if the .import has loop disabled (resource is shared).
-	if bgm.stream is AudioStreamMP3:
-		(bgm.stream as AudioStreamMP3).loop = true
-	elif bgm.stream is AudioStreamOggVorbis:
-		(bgm.stream as AudioStreamOggVorbis).loop = true
-	if bgm.stream != null and not bgm.playing:
-		bgm.volume_db = -40.0          # fade in instead of blasting on menu load
-		bgm.play()
-		_fade_music(MUSIC_VOLUME_DB, 0.8)
-	return bgm
-
 func _on_play_pressed():
-	_ensure_bgm()
-	if bgm != null and bgm.playing:
-		_fade_music(-40.0, 1.0)
+	# Music keeps playing into the game, just a bit quieter than in the menu.
+	Music.game_music()
 	print("Đang chạy Cutscene chuyển cảnh...")
 	
 	if anim_player:
