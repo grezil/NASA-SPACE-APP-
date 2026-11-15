@@ -7,7 +7,12 @@ Repo này là bản hợp nhất của `grezil/NASA-SPACE-APP-` (nhánh main) v�
 `KDSpaceTech/NASA-SPACE-APP-`. Phần chơi được hiện tại là bản của fork
 (`game.tscn` + `sol_system.gd`).
 
-## Chạy
+## Tải bản chơi (không cần Godot)
+
+**Windows 64-bit:** [5joblesS-win64.zip](https://github.com/grezil/NASA-SPACE-APP-/releases/download/v1.0.0/5joblesS-win64.zip)
+— giải nén, chạy `5joblesS/5joblesS.exe`. Toàn bộ release: [v1.0.0](https://github.com/grezil/NASA-SPACE-APP-/releases/tag/v1.0.0).
+
+## Chạy từ source
 
 1. Cài **Godot 4.7** (bản stable, có .NET cũng được — project không dùng C#).
 2. Mở `project.godot` → bấm **F5**.
