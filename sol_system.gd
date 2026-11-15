@@ -617,16 +617,6 @@ func _show_field_ops() -> void:
 	body += "Nhấn F6 để ra bề mặt, đến gần từng trạm và nhấn E.\n\n[Esc] Đóng bảng và quay lại game."
 	_show_panel(body, "info")
 
-func _show_eva_checklist() -> void:
-	var t := "CHECKLIST EVA / AIRLOCK\n\n"
-	t += "• Oxygen hiện tại: %d%%\n" % int(oxygen)
-	t += "• Power hiện tại: %d%%\n" % int(power)
-	t += "• Không nên đi EVA nếu Oxygen dưới 20%% hoặc Power dưới 10%%.\n"
-	t += "• Rover dùng pin căn cứ; mini-game mô phỏng thao tác khảo sát và lấy mẫu.\n\n"
-	t += "[Space] tiếp tục"
-	_show_panel(t, "info")
-
-
 func _show_lab_ops() -> void:
 	var body := "GEOLOGY LAB / HỒ SƠ NGHIÊN CỨU\n\n"
 	body += "Nghiên cứu mẫu đá được thực hiện tại trạm Geology Lab ngoài bề mặt Sao Hỏa.\n"
@@ -666,16 +656,6 @@ func _mars_report_status_text() -> String:
 	if mars_reports_created > 0:
 		return "ĐÃ TẠO BÁO CÁO"
 	return "CHƯA CÓ BÁO CÁO"
-
-func _toast_comms_online() -> void:
-	_toast("Vệ tinh liên lạc đã hoạt động. Dữ liệu NASA được truyền ổn định hơn.", Color(0.4, 1.0, 0.6))
-
-
-func _toast_no_samples() -> void:
-	_toast("Chưa có mẫu địa chất. Hãy chọn Rover trong Nhiệm vụ ngoài căn cứ.", Color(1.0, 0.85, 0.3))
-
-
-# ---------- Ba hoạt động demo ngoài bề mặt Sao Hỏa ----------
 
 func _start_mars_research() -> void:
 	if mars_research_report_ready:
@@ -811,65 +791,6 @@ func _show_nasa_submission_receipt(power_before_reward: float, actual_power_rewa
 	_show_panel(body, "info")
 
 
-func _start_rover_survey() -> void:
-	if power < 4.0 or oxygen < 6.0:
-		_toast("Không đủ dự trữ cho chuyến Rover (cần 4 Power và 6 Oxygen).", Color(1.0, 0.4, 0.4))
-		return
-	power = maxf(power - 4.0, 0.0)
-	oxygen = maxf(oxygen - 6.0, 0.0)
-	_update_ui()
-	_start_minigame("ROVER: KHẢO SÁT BỀ MẶT MARS", 4, 3, _on_rover_survey_done)
-
-
-func _on_rover_survey_done(ok: bool) -> void:
-	rover_runs += 1
-	if ok:
-		water_ice_kg += 8
-		regolith_kg += 4
-		rock_samples += 1
-		_add_science(2)
-		_toast("Khảo sát thành công: +8 băng nước, +4 regolith, +1 mẫu đá, +2 khoa học.", Color(0.5, 1.0, 0.6))
-	else:
-		# Rover vẫn tiêu hao điện và thời gian khi chuyến khảo sát không đạt yêu cầu.
-		oxygen = maxf(oxygen - 3.0, 0.0)
-		_toast("Khảo sát thất bại. Rover quay về an toàn nhưng không thu được mẫu.", Color(1.0, 0.55, 0.4))
-	_update_ui()
-
-
-func _start_comms_repair() -> void:
-	if comms_online:
-		_toast_comms_online()
-		return
-	if power < 5.0 or oxygen < 8.0:
-		_toast("Không đủ dự trữ cho EVA sửa vệ tinh (cần 5 Power và 8 Oxygen).", Color(1.0, 0.4, 0.4))
-		return
-	power = maxf(power - 5.0, 0.0)
-	oxygen = maxf(oxygen - 8.0, 0.0)
-	_update_ui()
-	_start_minigame("EVA: SỬA VỆ TINH LIÊN LẠC", 3, 2, _on_comms_repair_done)
-
-
-func _on_comms_repair_done(ok: bool) -> void:
-	if ok:
-		comms_online = true
-		_add_science(4)
-		_toast("EVA thành công! Vệ tinh đã kết nối lại với Mission Control. +4 khoa học.", Color(0.5, 1.0, 0.6))
-	else:
-		oxygen = maxf(oxygen - 5.0, 0.0)
-		_toast("Chưa sửa được vệ tinh. Phi hành gia trở về airlock, mất thêm 5 Oxygen.", Color(1.0, 0.55, 0.4))
-	_update_ui()
-
-
-func _analyze_rock_sample() -> void:
-	if rock_samples <= 0:
-		_toast_no_samples()
-		return
-	rock_samples -= 1
-	_add_science(3)
-	_toast("Phân tích mẫu Mars hoàn tất: +3 điểm khoa học.", Color(0.5, 0.85, 1.0))
-	_update_ui()
-
-
 func _toast_clean_ok() -> void:
 	_toast("Pin mặt trời đang sạch, không cần lau.", Color(0.4, 1.0, 0.5))
 
@@ -910,21 +831,6 @@ func _send_data() -> void:
 func _start_clean() -> void:
 	_clean_mars_solar_panels()
 
-
-func _on_clean_done(ok: bool) -> void:
-	if ok:
-		dust = false
-		mars_solar_cleaned_this_sol = true
-		power = maxf(power - clean_cost, 0.0)
-		_toast("Robot đã lau sạch bụi pin mặt trời (-%d Power)" % int(clean_cost), Color(0.4, 1.0, 0.5))
-	else:
-		power = maxf(power - 2.0, 0.0)
-		_toast("Robot bị kẹt! Pin vẫn còn bụi (-2 Power). Thử lại.", Color(1.0, 0.5, 0.4))
-	_refresh_device_names()
-	_save_game_state(false)
-
-
-# ---------- Nhà kính (Trạm thực phẩm) ----------
 
 func _on_food_used(_d, _p) -> void:
 	var opts: Array = []
