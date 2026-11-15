@@ -96,13 +96,14 @@ func _on_play_pressed():
 		# Đợi animation chạy xong hoàn toàn
 		await anim_player.animation_finished
 	
-	# Chuyển sang nhà kính
-	Global.current_scene = "res://greenhouse.tscn"
-	get_tree().change_scene_to_file("res://greenhouse.tscn")
+	# Chuyển sang màn chơi chính
+	get_tree().change_scene_to_file("res://game.tscn")
 
 func _on_save_pressed():
-	# Lưu tiến trình hiện tại (nhà kính tự lưu, đây là lưu tay từ menu).
-	Global.current_scene = "res://greenhouse.tscn"
+	Global.player_hp = 100.0
+	Global.player_food = 100.0
+	Global.player_position = Vector2.ZERO
+	Global.current_scene = "res://game.tscn"
 	Global.save_game()
 	print("Game saved.")
 

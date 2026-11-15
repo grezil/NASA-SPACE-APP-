@@ -1,224 +1,211 @@
 extends CharacterBody2D
-## Player: movement, hunger/HP, death dissolve. Works in any scene that has a
-## HUD (CanvasLayer) and a Camera2D sibling.
+## Nhân vật top-down cho Happy Valley (Godot 4.x).
+## Tự tìm Sprite2D / AnimatedSprite2D và Camera2D.
+## Camera2D đặt ngang hàng trong Game.tscn cũng được tự chuyển thành con của Player.
 
-@export var speed: float = 180.0
+signal hp_changed(value: float, max_value: float)
+signal food_changed(value: float, max_value: float)
+signal died
+
+@export_group("Movement")
+@export var walk_speed := 140.0
 ## Optional level rectangle (world space); the body is clamped inside it.
 @export var room_bounds: Rect2 = Rect2()
+@export var run_speed := 230.0
+@export var acceleration := 1200.0
+@export var friction := 1400.0
 
-# --- Food (hunger) & HP ---
-@export var max_hp: float = 100.0
-@export var max_food: float = 100.0
-# Rates tuned so a full bar lasts ~2 minutes (120s).
-@export var hunger_drain_rate: float = 0.83
-@export var hp_drain_when_hungry: float = 2.0
-@export var hungry_threshold: float = 25.0
-@export var eat_amount: float = 30.0
+@export_group("Survival")
+@export var max_hp := 100.0
+@export var max_food := 100.0
+@export var food_drain_per_sec := 0.2
+@export var run_food_drain_per_sec := 0.5
+@export var starving_damage_per_sec := 2.0
+@export var hp_regen_per_sec := 1.0
+@export var regen_food_threshold := 50.0
 
-var hp: float
-var food: float
-var _dead: bool = false
+@export_group("Camera")
+@export var auto_camera := true
+@export var camera_smoothing := true
 
-var hp_bar: ProgressBar
-var food_bar: ProgressBar
-var sprite: Sprite2D
-var camera: Camera2D
+var hp := 0.0
+var food := 0.0
+var facing := "down"
+var is_dead := false
 
-var _death_label: Label
-var _death_tween: Tween
-var _default_zoom := Vector2.ONE
+var sprite: Node2D
+var anim: AnimatedSprite2D
+var _base_y := 0.0
+var _bob_time := 0.0
 
-signal died
-signal hp_changed(new_hp: float)
-signal food_changed(new_food: float)
 
 func _ready() -> void:
-	hp = Global.player_hp
-	food = Global.player_food
+	add_to_group("player")
+	motion_mode = CharacterBody2D.MOTION_MODE_FLOATING
+	hp = max_hp
+	food = max_food
+	_setup_wasd()
+	_find_sprite()
+	if auto_camera:
+		_ensure_camera.call_deferred()
+	hp_changed.emit(hp, max_hp)
+	food_changed.emit(food, max_food)
 
-	sprite = get_node_or_null("Sprite2D")
-	var root := get_parent()
-	if root:
-		var hud := root.get_node_or_null("HUD")
-		if hud:
-			hp_bar = hud.get_node_or_null("Root/HPBar")
-			if hp_bar == null:
-				hp_bar = hud.get_node_or_null("HPBar")
-			food_bar = hud.get_node_or_null("Root/FoodBar")
-			if food_bar == null:
-				food_bar = hud.get_node_or_null("FoodBar")
-		camera = root.get_node_or_null("Camera2D")
-	if camera:
-		_default_zoom = camera.zoom
 
-	died.connect(_on_died)
-	_update_bars()
-
-func _physics_process(_delta: float) -> void:
-	if _dead or Global.ui_open:
-		velocity = Vector2.ZERO
+func _physics_process(delta: float) -> void:
+	if is_dead:
 		return
-	var input_direction := Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
-	velocity = input_direction * speed
+
+	var dir := Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
+	var running := Input.is_physical_key_pressed(KEY_SHIFT) and dir != Vector2.ZERO and food > 0.0
+	var target_speed := run_speed if running else walk_speed
+
+	if dir != Vector2.ZERO:
+		velocity = velocity.move_toward(dir * target_speed, acceleration * delta)
+	else:
+		velocity = velocity.move_toward(Vector2.ZERO, friction * delta)
+
 	move_and_slide()
 	_clamp_to_room()
+	_update_animation(dir, running, delta)
+	_update_survival(delta, running)
 
-	if camera:
-		var target := sprite.global_position if sprite else global_position
-		camera.global_position = target
 
 func _clamp_to_room() -> void:
 	if room_bounds.size.x <= 0.0 or room_bounds.size.y <= 0.0:
 		return
 	global_position = global_position.clamp(room_bounds.position, room_bounds.end)
 
-func _process(delta: float) -> void:
-	if _dead or Global.ui_open:
+
+# ---------- Tự tìm node ----------
+
+func _find_sprite() -> void:
+	for child in find_children("*", "", true, false):
+		if child is AnimatedSprite2D:
+			sprite = child
+			anim = child
+			return
+	for child in find_children("*", "", true, false):
+		if child is Sprite2D:
+			sprite = child
+			_base_y = sprite.position.y
+			return
+	push_warning("Player: không tìm thấy Sprite2D / AnimatedSprite2D")
+
+
+func _ensure_camera() -> void:
+	# Ưu tiên camera đang hoạt động; nếu chưa có thì tìm Camera2D trong scene.
+	var cam := get_viewport().get_camera_2d()
+	if cam == null and get_tree().current_scene != null:
+		cam = get_tree().current_scene.find_child("Camera2D", true, false) as Camera2D
+
+	# Chỉ tạo mới khi scene thực sự chưa có camera.
+	if cam == null:
+		cam = Camera2D.new()
+		cam.name = "Camera2D"
+		cam.position_smoothing_enabled = camera_smoothing
+		add_child(cam)
+	else:
+		# Camera là sibling của Player trong Game.tscn cũ; chuyển nó vào Player
+		# để Camera2D theo đúng vị trí nhân vật khi di chuyển.
+		if cam.get_parent() != self:
+			cam.reparent(self, false)
+		cam.position = Vector2.ZERO
+		cam.enabled = true
+		if camera_smoothing:
+			cam.position_smoothing_enabled = true
+
+	cam.make_current()
+
+
+# ---------- Animation ----------
+
+func _update_animation(dir: Vector2, running: bool, delta: float) -> void:
+	if sprite == null:
 		return
-	delta = minf(delta, 0.25)
 
-	food = max(food - hunger_drain_rate * delta, 0.0)
-
-	if food <= hungry_threshold and hp > 0.0:
-		hp = max(hp - hp_drain_when_hungry * delta, 0.0)
-
-	Global.player_hp = hp
-	Global.player_food = food
-
-	if sprite:
-		if hp > 0.0 and hp < max_hp * 0.3:
-			var t := Time.get_ticks_msec() / 1000.0
-			sprite.modulate.a = 0.35 + 0.65 * abs(sin(t * 7.0))
-			sprite.modulate.r = 1.0
-			sprite.modulate.g = 0.3
-			sprite.modulate.b = 0.3
+	if dir != Vector2.ZERO:
+		if absf(dir.x) > absf(dir.y):
+			facing = "right" if dir.x > 0.0 else "left"
 		else:
-			sprite.modulate = Color(1, 1, 1, 1)
+			facing = "down" if dir.y > 0.0 else "up"
 
-	_update_bars()
-
-	if hp <= 0.0:
-		hp = max_hp
-		_dead = true
-		emit_signal("died")
-
-func eat() -> void:
-	food = min(food + eat_amount, max_food)
-	_update_bars()
-	emit_signal("food_changed", food)
-
-func take_damage(amount: float) -> void:
-	if _dead:
+	if anim != null and anim.sprite_frames != null:
+		var state := "walk" if dir != Vector2.ZERO else "idle"
+		var full := "%s_%s" % [state, facing]
+		anim.speed_scale = 1.6 if running else 1.0
+		if anim.sprite_frames.has_animation(full):
+			anim.play(full)
+		elif anim.sprite_frames.has_animation(state):
+			if facing == "left":
+				anim.flip_h = true
+			elif facing == "right":
+				anim.flip_h = false
+			anim.play(state)
 		return
-	hp = max(hp - amount, 0.0)
-	_update_bars()
-	emit_signal("hp_changed", hp)
+
+	# Sprite tĩnh: lật ngang và nhún nhẹ khi di chuyển.
+	if sprite is Sprite2D and dir.x != 0.0:
+		(sprite as Sprite2D).flip_h = dir.x < 0.0
+	if dir != Vector2.ZERO:
+		_bob_time += delta * (16.0 if running else 11.0)
+		sprite.position.y = _base_y + sin(_bob_time) * 1.5
+	else:
+		sprite.position.y = lerpf(sprite.position.y, _base_y, 0.3)
+
+
+# ---------- Sinh tồn ----------
+
+func _update_survival(delta: float, running: bool) -> void:
+	var drain := run_food_drain_per_sec if running else food_drain_per_sec
+	food = maxf(food - drain * delta, 0.0)
+	food_changed.emit(food, max_food)
+
+	if food <= 0.0:
+		take_damage(starving_damage_per_sec * delta, false)
+	elif food >= regen_food_threshold and hp < max_hp:
+		hp = minf(hp + hp_regen_per_sec * delta, max_hp)
+		hp_changed.emit(hp, max_hp)
+
+
+func take_damage(amount: float, flash := true) -> void:
+	if is_dead:
+		return
+	hp = maxf(hp - amount, 0.0)
+	hp_changed.emit(hp, max_hp)
+	if flash and sprite != null:
+		sprite.modulate = Color(1, 0.3, 0.3)
+		create_tween().tween_property(sprite, "modulate", Color.WHITE, 0.2)
+	if hp <= 0.0:
+		_die()
+
 
 func heal(amount: float) -> void:
-	hp = min(hp + amount, max_hp)
-	_update_bars()
-	emit_signal("hp_changed", hp)
+	if is_dead:
+		return
+	hp = minf(hp + amount, max_hp)
+	hp_changed.emit(hp, max_hp)
 
-func _update_bars() -> void:
-	if hp_bar:
-		hp_bar.max_value = max_hp
-		hp_bar.value = hp
-	if food_bar:
-		food_bar.max_value = max_food
-		food_bar.value = food
-	emit_signal("hp_changed", hp)
-	emit_signal("food_changed", food)
 
-func revive() -> void:
-	## Undo the death state (called by the greenhouse after a timeout).
-	_dead = false
-	set_physics_process(true)
-	set_process(true)
-	hp = max_hp
-	food = max_food
-	if sprite:
-		sprite.visible = true
-		sprite.material = null
-		sprite.modulate = Color(1, 1, 1, 1)
-		sprite.rotation = 0.0
-		sprite.scale = Vector2(0.14993763, 0.13387283)
-	if _death_tween and _death_tween.is_valid():
-		_death_tween.kill()
-		_death_tween = null
-	if _death_label and is_instance_valid(_death_label):
-		_death_label.queue_free()
-		_death_label = null
-	if camera:
-		camera.zoom = _default_zoom
-	_update_bars()
+func eat(amount: float) -> void:
+	food = minf(food + amount, max_food)
+	food_changed.emit(food, max_food)
 
-func _on_died() -> void:
+
+func _die() -> void:
+	is_dead = true
 	velocity = Vector2.ZERO
-	set_physics_process(false)
-	Global.player_hp = max_hp
-	Global.player_food = food
-	Global.player_position = global_position
-	Global.save_game()
+	if anim != null and anim.sprite_frames != null and anim.sprite_frames.has_animation("die"):
+		anim.play("die")
+	elif sprite != null:
+		create_tween().tween_property(sprite, "modulate:a", 0.0, 0.6)
+	died.emit()
 
-	if sprite:
-		var shader := Shader.new()
-		shader.code = """
-shader_type canvas_item;
 
-uniform float dissolve_amount : hint_range(0.0, 1.0) = 0.0;
-uniform float edge_width : hint_range(0.0, 0.15) = 0.06;
-uniform vec4 edge_color : source_color = vec4(1.0, 0.85, 0.4, 1.0);
-uniform sampler2D noise_tex;
-
-void fragment() {
-	vec4 tex = texture(TEXTURE, UV);
-	float noise = texture(noise_tex, UV).r;
-	float threshold = noise + (1.0 - UV.y) * 0.35;
-	float alpha = step(dissolve_amount, threshold);
-	float edge = 1.0 - smoothstep(0.0, edge_width, threshold - dissolve_amount);
-	vec3 col = tex.rgb;
-	if (edge > 0.0 && alpha < 1.0) {
-		col = mix(tex.rgb, edge_color.rgb, edge);
-	}
-	COLOR = vec4(col, tex.a * alpha);
-}
-"""
-		var mat := ShaderMaterial.new()
-		mat.shader = shader
-		var fast_noise := FastNoiseLite.new()
-		fast_noise.noise_type = FastNoiseLite.TYPE_SIMPLEX
-		fast_noise.frequency = 0.012
-		var img := Image.create(128, 128, false, Image.FORMAT_RF)
-		for x in range(128):
-			for y in range(128):
-				var v := fast_noise.get_noise_2d(x, y)
-				img.set_pixel(x, y, Color((v + 1.0) * 0.5, 0.0, 0.0, 1.0))
-		var noise_tex := ImageTexture.create_from_image(img)
-		mat.set_shader_parameter("noise_tex", noise_tex)
-		mat.set_shader_parameter("dissolve_amount", 0.0)
-		sprite.material = mat
-
-		var dissolve_tween := create_tween()
-		dissolve_tween.tween_method(func(val): mat.set_shader_parameter("dissolve_amount", val), 0.0, 1.0, 1.2).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
-		dissolve_tween.tween_callback(func(): sprite.visible = false)
-
-	var label := Label.new()
-	label.text = "Y O U   D I E"
-	var spawn_pos := sprite.global_position if sprite else global_position
-	label.size = Vector2(240, 40)
-	label.position = spawn_pos + Vector2(-120, -45)
-	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.4, 1.0))
-	label.add_theme_font_size_override("font_size", 26)
-	label.add_theme_color_override("font_outline_color", Color(0.2, 0.1, 0.0, 0.9))
-	label.add_theme_constant_override("outline_size", 6)
-	var label_parent := get_parent() if get_parent() else self
-	label_parent.add_child(label)
-	_death_label = label
-	_death_tween = create_tween().set_loops()
-	_death_tween.tween_property(label, "modulate:a", 0.4, 0.6).set_trans(Tween.TRANS_SINE)
-	_death_tween.tween_property(label, "modulate:a", 1.0, 0.6).set_trans(Tween.TRANS_SINE)
-
-	if camera:
-		var zoom_tween := create_tween()
-		zoom_tween.tween_property(camera, "zoom", Vector2(1.6, 1.6), 0.45).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+func _setup_wasd() -> void:
+	var actions := {"ui_left": KEY_A, "ui_right": KEY_D, "ui_up": KEY_W, "ui_down": KEY_S}
+	for action in actions:
+		var ev := InputEventKey.new()
+		ev.physical_keycode = actions[action]
+		if not InputMap.action_has_event(action, ev):
+			InputMap.action_add_event(action, ev)

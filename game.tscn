@@ -1,24 +1,32 @@
-[gd_scene format=3 uid="uid://dhbkugd61cksy"]
+[gd_scene format=3 uid="uid://dd4jctbsmvq0d"]
 
 [ext_resource type="Script" uid="uid://cb22jbw2bp4yn" path="res://player.gd" id="2_e2o6t"]
-
-[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_feb5d"]
-load_path = "res://.godot/imported/Character.png-bbf5947120bf90fb25be265ba323242e.ctex"
+[ext_resource type="Script" uid="uid://yr4l2l6xapyq" path="res://room_setup.gd" id="3_eow3j"]
+[ext_resource type="Texture2D" uid="uid://diihfl5i8mk8o" path="res://backgroundfix.png" id="4_j5wjh"]
+[ext_resource type="Texture2D" uid="uid://csr3i2rl5r71" path="res://Sinh_sComputer.png" id="5_vef74"]
+[ext_resource type="Texture2D" uid="uid://huii5g60n7uf" path="res://food_station.png" id="6_eow3j"]
+[ext_resource type="Texture2D" uid="uid://b5x2hw7hu0aif" path="res://Fuelcontainer.png" id="7_mfdv2"]
+[ext_resource type="Script" uid="uid://b3sn10odqjnwr" path="res://map.gd" id="8_mars_map"]
+[ext_resource type="Script" uid="uid://kyqc1w7cujor" path="res://world_controller.gd" id="9_world_controller"]
+[ext_resource type="Texture2D" uid="uid://b4yo8e7svedx4" path="res://Character.png" id="10_character"]
+[ext_resource type="Texture2D" uid="uid://dcdods8kwaq16" path="res://Mars/Gemini_Generated_Image_gzufvtgzufvtgzuf-removebg-preview.png" id="10_iotsf"]
+[ext_resource type="Texture2D" uid="uid://co0hlnkqbf6we" path="res://Mars/Gemini_Generated_Image_tcxh7dtcxh7dtcxh-removebg-preview.png" id="11_lc2xo"]
+[ext_resource type="Texture2D" uid="uid://bkj4f5lgydjps" path="res://Mars/Gemini_Generated_Image_fpayx8fpayx8fpay-removebg-preview.png" id="12_lc2xo"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_5utp4"]
 radius = 40.04997
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_bg"]
 bg_color = Color(0.15, 0.05, 0.05, 0.85)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
 border_color = Color(0.4, 0.1, 0.1, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_fill"]
 bg_color = Color(0.9, 0.15, 0.15, 1)
@@ -29,15 +37,15 @@ corner_radius_bottom_left = 5
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_food_bg"]
 bg_color = Color(0.05, 0.12, 0.05, 0.85)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
 border_color = Color(0.1, 0.3, 0.1, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_food_fill"]
 bg_color = Color(0.95, 0.6, 0.1, 1)
@@ -45,25 +53,23 @@ corner_radius_top_left = 5
 corner_radius_top_right = 5
 corner_radius_bottom_right = 5
 corner_radius_bottom_left = 5
+
 [node name="Game" type="Node2D" unique_id=1052284187]
 
-[node name="Camera2D" type="Camera2D" parent="." unique_id=1088402511]
-position_smoothing_enabled = true
-rotation_smoothing_enabled = true
-
-[node name="Player" type="CharacterBody2D" parent="." unique_id=1534722963]
-position = Vector2(0, 0)
+[node name="Player" type="CharacterBody2D" parent="." unique_id=469156227]
 script = ExtResource("2_e2o6t")
 
 [node name="Sprite2D" type="Sprite2D" parent="Player" unique_id=229687593]
-position = Vector2(158.925, 85.425)
+position = Vector2(4.925, -20.575)
 scale = Vector2(0.18742204, 0.16734104)
-texture = SubResource("CompressedTexture2D_feb5d")
+texture = ExtResource("10_character")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Player" unique_id=1174978447]
-position = Vector2(154, 106)
 shape = SubResource("CircleShape2D_5utp4")
 
+[node name="Camera2D" type="Camera2D" parent="Player" unique_id=1088402511]
+position_smoothing_enabled = true
+rotation_smoothing_enabled = true
 
 [node name="HUD" type="CanvasLayer" parent="." unique_id=9999001]
 
@@ -72,41 +78,56 @@ offset_left = 16.0
 offset_top = 16.0
 offset_right = 236.0
 offset_bottom = 44.0
-max_value = 100.0
-value = 100.0
-show_percentage = false
 theme_override_styles/background = SubResource("StyleBoxFlat_hp_bg")
 theme_override_styles/fill = SubResource("StyleBoxFlat_hp_fill")
+value = 100.0
+show_percentage = false
 
 [node name="HPLabel" type="Label" parent="HUD" unique_id=9999004]
 offset_left = 16.0
 offset_top = 16.0
 offset_right = 236.0
 offset_bottom = 44.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 14
 text = "HP"
 horizontal_alignment = 1
 vertical_alignment = 1
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 14
 
 [node name="FoodBar" type="ProgressBar" parent="HUD" unique_id=9999003]
 offset_left = 16.0
 offset_top = 52.0
 offset_right = 236.0
 offset_bottom = 80.0
-max_value = 100.0
-value = 100.0
-show_percentage = false
 theme_override_styles/background = SubResource("StyleBoxFlat_food_bg")
 theme_override_styles/fill = SubResource("StyleBoxFlat_food_fill")
+value = 100.0
+show_percentage = false
 
 [node name="FoodLabel" type="Label" parent="HUD" unique_id=9999005]
 offset_left = 16.0
 offset_top = 52.0
 offset_right = 236.0
 offset_bottom = 80.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 14
 text = "FOOD"
 horizontal_alignment = 1
 vertical_alignment = 1
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 14
+
+[node name="Room" type="Node2D" parent="." unique_id=439336790]
+script = ExtResource("3_eow3j")
+background = ExtResource("4_j5wjh")
+computer = ExtResource("5_vef74")
+food_station = ExtResource("6_eow3j")
+fuel_container = ExtResource("7_mfdv2")
+
+[node name="MarsMap" type="Node2D" parent="." unique_id=385865591]
+visible = false
+script = ExtResource("8_mars_map")
+geology_lab_texture = ExtResource("10_iotsf")
+solar_array_texture = ExtResource("11_lc2xo")
+communications_relay_texture = ExtResource("12_lc2xo")
+
+[node name="WorldController" type="Node" parent="." unique_id=1236947192]
+script = ExtResource("9_world_controller")
