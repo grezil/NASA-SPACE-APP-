@@ -30,6 +30,9 @@ func _ready():
 	# 3. Khởi chạy hiệu ứng nhấp nhô tiêu đề
 	start_title_floating()
 
+	# 4. Nhạc nền menu (tự tạo AudioStreamPlayer nếu scene chưa có)
+	_ensure_bgm()
+
 # --- HIỆU ỨNG TIÊU ĐỀ LƠ LỬNG ---
 func start_title_floating():
 	if not title_label: return
@@ -87,10 +90,35 @@ func _on_button_click(btn: Button, is_down: bool):
 # --- CHỨC NĂNG CÁC NÚT BẤM ---
 @onready var anim_player = $CanvasLayer/AnimationPlayer
 
+const MUSIC_PATH := "res://Jimmy Fontanez - Dub Hub ♫ NO COPYRIGHT 8-bit Music.mp3"
+
+var bgm: AudioStreamPlayer
+
+## Menu music: reuse a BGM/AudioStreamPlayer node in the scene, or create one.
+func _ensure_bgm() -> AudioStreamPlayer:
+	if bgm != null and is_instance_valid(bgm):
+		return bgm
+	bgm = get_node_or_null("BGM") as AudioStreamPlayer
+	if bgm == null:
+		bgm = find_child("BGM", true, false) as AudioStreamPlayer
+	if bgm == null:
+		bgm = get_node_or_null("CanvasLayer/BGM") as AudioStreamPlayer
+	if bgm == null:
+		bgm = AudioStreamPlayer.new()
+		bgm.name = "BGM"
+		if ResourceLoader.exists(MUSIC_PATH):
+			bgm.stream = load(MUSIC_PATH) as AudioStream
+		bgm.volume_db = -8.0
+		add_child(bgm)
+	if bgm.stream != null and not bgm.playing:
+		bgm.play()
+	return bgm
+
 func _on_play_pressed():
-    if bgm: 
-      var music_tween = create_tween()
-music_tween.tween_property($BGM, "volume_db", -40.0, 1.0)
+	var music := _ensure_bgm()
+	if music != null and music.playing:
+		var music_tween := create_tween()
+		music_tween.tween_property(music, "volume_db", -40.0, 1.0)
 	print("Đang chạy Cutscene chuyển cảnh...")
 	
 	if anim_player:
