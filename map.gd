@@ -205,6 +205,14 @@ func _build_points() -> void:
 			"action": "_clean_mars_solar_panels",
 		},
 		{
+			"id": "airlock",
+			"name": "Airlock / Về căn cứ",
+			"hint": "Vào lại khoang chính để nạp lại suit và oxy",
+			"position": Vector2(-900.0, 250.0),
+			"radius": 160.0,
+			"action": "_return_to_base_from_eva",
+		},
+		{
 			"id": "nasa_relay",
 			"name": "NASA Data Relay / Gửi báo cáo",
 			"hint": "Gửi dữ liệu nghiên cứu về NASA để nhận thưởng",

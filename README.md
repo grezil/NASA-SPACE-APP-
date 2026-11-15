@@ -28,7 +28,9 @@ Repo này là bản hợp nhất của `grezil/NASA-SPACE-APP-` (nhánh main) v�
 | `T` (giữ) | Tua nhanh thời gian x8 |
 | `E` tại cửa **MODULE TRỒNG CÂY** | Vào khoang trồng cây (10 khay) |
 | `G` | Vào/ra khoang trồng cây (phím tắt) |
-| `F6` | Ra/vào bề mặt Sao Hỏa (để kiểm thử) |
+| `E` tại cửa **AIRLOCK: RA SAO HỎA** (tường trái khoang chính) | Ra bề mặt Sao Hỏa |
+| `E` tại điểm **Airlock / Về căn cứ** trên bản đồ | Quay vào căn cứ (nạp lại suit) |
+| `F6` | Phím tắt ra/vào bề mặt (để kiểm thử nhanh) |
 
 Mẹo: lúc mới vào có bảng **briefing Sol** và game tạm dừng — bấm `Esc` để chơi.
 
@@ -61,7 +63,10 @@ assets/bg/greenhouse_growing.png   nền khoang trồng cây (1280x640, 10 ô đ
 - **Khoang trồng cây** (`growing_room.gd`): 10 khay khớp 10 ô đất trong ảnh nền.
   Cây lớn theo thời gian thực, nhả oxy (dùng chung `Global.tick_beds`), tưới tốn
   6 nước/bồn, thu hoạch vào túi — cùng logic với scene nhà kính cũ.
-- Mars map có 3 điểm: **Geology Lab** (phân tích mẫu → báo cáo), **Solar Array**
+- Đường ra Sao Hỏa: đứng ở cửa **AIRLOCK** bên trái khoang chính, bấm `E`.
+  Ngoài bề mặt oxy tụt ~0.8%/giây — quay về bằng điểm **Airlock / Về căn cứ**
+  trên bản đồ hoặc `F6`.
+- Mars map có 3 điểm hoạt động + 1 điểm airlock: **Geology Lab** (phân tích mẫu → báo cáo), **Solar Array**
   (vệ sinh pin khi bụi), **NASA Data Relay** (gửi báo cáo → +Power, +khoa học, +điểm).
 - `greenhouse.tscn` (bản main cũ) vẫn chạy được bằng `godot --path . res://greenhouse.tscn`
   nhưng nội dung nhà kính hiện tại nằm trong `sol_system.gd`.

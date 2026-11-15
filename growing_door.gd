@@ -2,9 +2,12 @@ extends Node2D
 ## Cửa sang module trồng cây, đặt trong khoang chính (Game.tscn > Room).
 ## Không cần ảnh riêng: cửa được vẽ bằng code, bấm E khi đứng gần để đi vào.
 
-@export var door_size := Vector2(150.0, 110.0)
+@export var door_size := Vector2(96.0, 72.0)
 @export var label_text := "MODULE TRỒNG CÂY"
-@export var trigger_radius := 120.0
+@export var trigger_radius := 110.0
+## Hàm trên WorldController sẽ gọi khi bấm E (enter_growing / enter_exterior).
+@export var target_method := "enter_growing"
+@export var accent := Color(0.35, 0.85, 1.0)
 
 var _player: CharacterBody2D
 var _highlight := 0.0
@@ -50,15 +53,15 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func enter() -> void:
 	var controller := get_tree().current_scene.find_child("WorldController", true, false)
-	if controller != null and controller.has_method("enter_growing"):
-		controller.call("enter_growing")
+	if controller != null and controller.has_method(target_method):
+		controller.call(target_method)
 
 
 func _draw() -> void:
 	var rect := Rect2(Vector2(-door_size.x * 0.5, -door_size.y * 0.5), door_size)
 	# Khung cửa.
 	draw_rect(rect, Color(0.05, 0.08, 0.10, 0.88), true)
-	var edge := Color(0.35, 0.85, 1.0, 0.55 + 0.45 * _highlight)
+	var edge := Color(accent.r, accent.g, accent.b, 0.55 + 0.45 * _highlight)
 	draw_rect(rect, edge, false, 3.0)
 	# Hai cánh cửa.
 	var half := door_size.x * 0.5
@@ -66,7 +69,7 @@ func _draw() -> void:
 	draw_line(Vector2(half - 8, -door_size.y * 0.5 + 8), Vector2(6, 0), edge, 2.0)
 	# Ánh sáng từ trong.
 	draw_rect(Rect2(Vector2(-half + 10, door_size.y * 0.5 - 14), Vector2(door_size.x - 20, 12)),
-		Color(0.3, 0.9, 1.0, 0.10 + 0.18 * _highlight), true)
+		Color(accent.r, accent.g, accent.b, 0.10 + 0.18 * _highlight), true)
 	# Nhãn.
 	var font := ThemeDB.fallback_font
 	var text := "[E] " + label_text

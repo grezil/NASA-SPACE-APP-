@@ -745,6 +745,20 @@ func _on_mars_solar_clean_done(ok: bool) -> void:
 	_save_game_state(false)
 
 
+## Gọi từ điểm Airlock trên bản đồ Sao Hỏa: quay về khoang chính.
+func _return_to_base_from_eva() -> void:
+	if _world_controller == null or not is_instance_valid(_world_controller):
+		var scene := get_tree().current_scene
+		if scene != null:
+			_world_controller = scene.find_child("WorldController", true, false)
+	if _world_controller != null and _world_controller.has_method("return_to_interior"):
+		_world_controller.call("return_to_interior")
+		_toast("Đã vào airlock: suit được nạp lại oxy.", Color(0.6, 1.0, 0.7))
+	else:
+		_toast("Không tìm thấy airlock để quay về.", Color(1.0, 0.5, 0.4))
+	_save_game_state(false)
+
+
 func _send_mars_research_to_nasa() -> void:
 	if not mars_research_report_ready:
 		_show_lab_ops()

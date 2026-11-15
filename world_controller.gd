@@ -7,7 +7,7 @@ extends Node
 @export_node_path("Node2D") var map_path: NodePath = ^"../MarsMap"
 @export_node_path("Node2D") var growing_path: NodePath = ^"../GrowingRoom"
 @export_node_path("CharacterBody2D") var player_path: NodePath = ^"../Player"
-@export var exterior_spawn := Vector2(-1050.0, 300.0)
+@export var exterior_spawn := Vector2(-900.0, 210.0)
 
 var _room: Node2D
 var _map: Node2D
@@ -134,6 +134,8 @@ func return_from_growing() -> void:
 func enter_exterior() -> void:
 	if _inside_surface or _room == null or _map == null or _player == null:
 		return
+	if _inside_growing:
+		return_from_growing()
 
 	_interior_position = _player.global_position
 	_player.velocity = Vector2.ZERO
