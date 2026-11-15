@@ -110,14 +110,11 @@ func _ready() -> void:
 	_add_device(fuel_container, "Bình nhiên liệu", 0.0, 0.0, "Đã lấy nhiên liệu", 5.0, [], "", Vector4(0, 90, 0, 0))
 	_add_device(fuel_container, "Bình nhiên liệu", 0.0, 0.0, "Đã lấy nhiên liệu", 5.0, [], "", Vector4(0, 90, 0, 0))
 
-	# ===== DÁN 3 DÒNG NÀY =====
+	# SolSystem drives the whole run: it binds the room devices and builds its own UI.
 	var sol_system := SolSystem.new()
 	add_child(sol_system)
 	sol_system.bind(_devices)
-	# ==========================
 
-	if move_player_to_spawn:
-		_move_player_to_spawn()
 	if move_player_to_spawn:
 		_move_player_to_spawn()
 	if limit_camera:

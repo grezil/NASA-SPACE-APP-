@@ -1,9 +1,22 @@
-# Godot
+# Godot 4 (https://github.com/github/gitignore/blob/main/Godot.gitignore)
 .godot/
-*.import
+# Export builds
+build/
+*.exe
+*.pck
+*.zip
+*.x86_64
+*.x86_32
+*.arm64
+*.arm32
+
 # OS
 .DS_Store
 Thumbs.db
-# Builds
-*.exe
-*.pck
+desktop.ini
+
+# Editors
+.vscode/
+.idea/
+
+# NOTE: *.import and *.uid files MUST be committed - Godot needs them.

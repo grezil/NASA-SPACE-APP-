@@ -1,28 +1,55 @@
 # NASA-SPACE-APP-
 
-Game Godot 4.7: nhà kính vũ trụ (trồng trọt + sinh tồn).
+Game Godot 4.7 (top-down) về căn cứ / nhà kính trên Sao Hỏa: sinh tồn theo Sol,
+trồng trọt, quản lý điện–oxy–nhiên liệu, mini-game và hoạt động ngoài bề mặt.
+
+Repo này là bản hợp nhất của `grezil/NASA-SPACE-APP-` (nhánh main) và fork
+`KDSpaceTech/NASA-SPACE-APP-`. Phần chơi được hiện tại là bản của fork
+(`game.tscn` + `sol_system.gd`).
 
 ## Chạy
 
-Mở project bằng Godot 4.7 → bấm **F5**. Từ menu bấm **Play** để vào nhà kính.
+1. Cài **Godot 4.7** (bản stable, có .NET cũng được — project không dùng C#).
+2. Mở `project.godot` → bấm **F5**.
+3. Menu → **Play** → vào căn cứ. **Save Game** ghi `user://save.cfg`,
+   lần chơi sau tự khôi phục tiến trình.
 
 ## Điều khiển
 
 | Phím | Tác dụng |
 |---|---|
-| `Arrow key` / mũi tên | Di chuyển |
-| `E` | Tương tác: trồng / tưới / thu hoạch / máy tính / máy O₂ / bồn fuel |
-| `TAB` | Túi đồ |
-| `Q` | Ăn nông sản tốt nhất |
-| `ESC` | Đóng bảng |
+| `WASD` / phím mũi tên | Di chuyển |
+| `Shift` (giữ) | Chạy (tốn Food nhanh hơn) |
+| `E` | Dùng thiết bị đang đứng gần (máy tính, trạm thực phẩm, bình nhiên liệu) |
+| `1`–`5` | Chọn mục trong bảng của máy tính |
+| `Space` | Tiếp tục / dừng vạch trong mini-game |
+| `Esc` | Đóng bảng, đóng briefing |
+| `Q` | Bật/tắt chế độ tiết kiệm (ít điện, ít oxy hơn) |
+| `T` (giữ) | Tua nhanh thời gian x8 |
 
-## Vòng chơi
+Mẹo: lúc mới vào có bảng **briefing Sol** và game tạm dừng — bấm `Esc` để chơi.
 
-1. Mua hạt ở **máy tính** (góc trái trên).
-2. Đến luống trống → `E` → chọn hạt → tự tưới.
-3. Chờ cây lớn (80–200 s), `E` để thu hoạch.
-4. Bán nông sản lấy credits, hoặc ăn để hồi Food/HP.
-5. Giữ **O₂** trên 0: cây trưởng thành nhả O₂, máy tạo O₂ tốn power.
-6. Cây vẫn lớn khi tắt game (lớn offline).
+## Cấu trúc
 
-Thiết kế chi tiết: [docs/gameplay-plan.md](docs/gameplay-plan.md).
+```
+Menu.tscn / node_2d.gd     menu chính (PLAY, SAVE GAME, CREDIT) + nhạc nền
+game.tscn                  scene chơi chính: Player, HUD (HP/FOOD), Room, MarsMap
+  player.gd                di chuyển, sinh tồn, clamp trong room_bounds
+  room_setup.gd            dựng nền/tường + 3 loại thiết bị, gắn SolSystem
+  sol_system.gd            vòng chơi Sol, nhiệm vụ, nhà kính, mini-game, UI phải
+  map.gd                   bản đồ Sao Hỏa (điểm tương tác EVA)
+  world_controller.gd      chuyển giữa trong căn cứ và ngoài bề mặt
+Global.gd                  autoload: HP/Food, oxy/nước/điện/fuel/credits, inventory, beds, save/load
+GameData.gd                bảng dữ liệu cây trồng và vật phẩm
+HUD.gd + greenhouse.tscn   scene nhà kính cũ của main (chạy độc lập được, không nối từ menu)
+assets/                    ảnh cây trồng, vật phẩm, nền nhà kính
+```
+
+## Ghi chú
+
+- **Ảnh bản đồ Sao Hỏa chưa có trong repo**: `map.gd` dò `res://assets/mars/*.png`
+  và tự vẽ placeholder nếu thiếu. Thả ảnh vào đó là map có hình ngay.
+- `greenhouse.tscn` (bản main cũ) vẫn chạy được bằng `godot --path . res://greenhouse.tscn`
+  nhưng nội dung nhà kính hiện tại nằm trong `sol_system.gd`.
+- Nhạc: "Dub Hub" — Jimmy Fontanez (no copyright 8-bit music).
+- Thiết kế chi tiết: [docs/gameplay-plan.md](docs/gameplay-plan.md).
