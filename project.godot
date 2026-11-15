@@ -10,7 +10,7 @@ config_version=5
 
 [application]
 
-config/name="4joblesS"
+config/name="5joblesS"
 run/main_scene="uid://ciho4afrrj8i5"
 config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://icon.svg"

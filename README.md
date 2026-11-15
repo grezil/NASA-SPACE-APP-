@@ -72,5 +72,5 @@ assets/bg/greenhouse_growing.png   nền khoang trồng cây (1280x640, 10 ô đ
   nhưng nội dung nhà kính hiện tại nằm trong `sol_system.gd`.
 - Nhạc: "Dub Hub" — Jimmy Fontanez (no copyright 8-bit music), phát lặp qua autoload
   `Music.gd` (menu −8 dB, trong game −14 dB). Nếu không nghe thấy: kiểm tra Windows
-  Volume Mixer cho `Godot`/`4joblesS` và đảm bảo chạy từ `Menu.tscn` (F5).
+  Volume Mixer cho `Godot`/`5joblesS` và đảm bảo chạy từ `Menu.tscn` (F5).
 - Thiết kế chi tiết: [docs/gameplay-plan.md](docs/gameplay-plan.md).
