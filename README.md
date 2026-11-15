@@ -10,7 +10,7 @@ Mở project bằng Godot 4.7 → bấm **F5**. Từ menu bấm **Play** để v
 
 | Phím | Tác dụng |
 |---|---|
-| `WASD` / mũi tên | Di chuyển |
+| `Arrow key` / mũi tên | Di chuyển |
 | `E` | Tương tác: trồng / tưới / thu hoạch / máy tính / máy O₂ / bồn fuel |
 | `TAB` | Túi đồ |
 | `Q` | Ăn nông sản tốt nhất |
