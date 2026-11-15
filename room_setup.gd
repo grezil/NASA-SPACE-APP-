@@ -147,6 +147,11 @@ func _process(_delta: float) -> void:
 				best_score = score
 				best = d
 
+	# Cửa (airlock / module trồng cây) được ưu tiên: đứng ở cửa thì không chọn thiết bị,
+	# tránh chuyện bấm E bị máy tính nuốt mất.
+	if best != null and _door_near():
+		best = null
+
 	_focused = best
 	for d in _devices:
 		d.focused = (d == best)
@@ -159,6 +164,14 @@ func _process(_delta: float) -> void:
 			var mark := "   <== ĐANG CHỌN" if d == best else ""
 			lines.append("  %s: cách %d px%s" % [d.device_name, int(d.distance_to(p)), mark])
 		_set_debug("\n".join(lines))
+
+
+## Có cửa nào đang trong tầm bấm E của người chơi không?
+func _door_near() -> bool:
+	for child in get_children():
+		if child.has_method("is_player_near") and bool(child.call("is_player_near")):
+			return true
+	return false
 
 
 func _find_player() -> Node2D:
@@ -190,7 +203,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			_debug_canvas.visible = debug_overlay
 			_debug_canvas.queue_redraw()
 		return
-	if event.is_action_pressed("interact") and _focused != null and _player != null:
+	if event.is_action_pressed("interact") and _focused != null and _player != null and not _door_near():
 		_focused.interact(_player)
 
 

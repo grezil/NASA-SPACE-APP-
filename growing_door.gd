@@ -51,6 +51,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		enter()
 
 
+func is_player_near() -> bool:
+	return _focused
+
+
 func enter() -> void:
 	var controller := get_tree().current_scene.find_child("WorldController", true, false)
 	if controller != null and controller.has_method(target_method):
