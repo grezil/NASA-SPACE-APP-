@@ -31,7 +31,7 @@ func _ready():
 	start_title_floating()
 
 	# 4. Nhạc nền do autoload Music lo (phát xuyên scene)
-	Music.menu_music()
+	Music.play_menu()
 
 # --- HIỆU ỨNG TIÊU ĐỀ LƠ LỬNG ---
 func start_title_floating():
@@ -91,8 +91,8 @@ func _on_button_click(btn: Button, is_down: bool):
 @onready var anim_player = $CanvasLayer/AnimationPlayer
 
 func _on_play_pressed():
-	# Music keeps playing into the game, just a bit quieter than in the menu.
-	Music.game_music()
+	# Sang nhạc ingame (crossfade), nhạc menu tắt dần.
+	Music.play_game()
 	print("Đang chạy Cutscene chuyển cảnh...")
 	
 	if anim_player:
@@ -173,8 +173,8 @@ func _build_credits() -> void:
 	_credit_gap(34)
 
 	_credit_head("ÂM NHẠC")
-	_credit_name("\"Dub Hub\" — Jimmy Fontanez")
-	_credit_small("No Copyright 8-bit Music")
+	_credit_name("Menu: \"Dub Hub\" — Jimmy Fontanez (No Copyright 8-bit Music)")
+	_credit_name("Trong game: \"8-Bit Fantasy & Adventure Music\"")
 	_credit_gap(34)
 
 	_credit_head("ĐỒ HOẠ")

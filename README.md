@@ -38,7 +38,8 @@ Mẹo: lúc mới vào có bảng **briefing Sol** và game tạm dừng — b�
 
 ```
 Menu.tscn / node_2d.gd     menu chính (PLAY, SAVE GAME, CREDIT)
-Music.gd                   autoload nhạc nền: phát từ menu và tiếp tục trong game
+Music.gd                   autoload nhạc nền: 2 track (menu / ingame) + crossfade
+audio/ingame_theme.mp3     nhạc trong game (6 phút, loop)
 game.tscn                  scene chơi chính: Player, HUD (HP/FOOD), Room, MarsMap
   player.gd                di chuyển, sinh tồn, clamp trong room_bounds
   room_setup.gd            dựng nền/tường + 3 loại thiết bị, gắn SolSystem
@@ -70,7 +71,10 @@ assets/bg/greenhouse_growing.png   nền khoang trồng cây (1280x640, 10 ô đ
   (vệ sinh pin khi bụi), **NASA Data Relay** (gửi báo cáo → +Power, +khoa học, +điểm).
 - `greenhouse.tscn` (bản main cũ) vẫn chạy được bằng `godot --path . res://greenhouse.tscn`
   nhưng nội dung nhà kính hiện tại nằm trong `sol_system.gd`.
-- Nhạc: "Dub Hub" — Jimmy Fontanez (no copyright 8-bit music), phát lặp qua autoload
-  `Music.gd` (menu −8 dB, trong game −14 dB). Nếu không nghe thấy: kiểm tra Windows
-  Volume Mixer cho `Godot`/`5joblesS` và đảm bảo chạy từ `Menu.tscn` (F5).
+- Nhạc nền 2 track qua autoload `Music.gd`, crossfade khi chuyển cảnh:
+  - **Menu** (chỉ ở màn hình bắt đầu): "Dub Hub" — Jimmy Fontanez (No Copyright 8-bit Music), −8 dB.
+  - **Trong game**: "8-Bit Fantasy & Adventure Music" (`audio/ingame_theme.mp3`,
+    6 phút, loop, −12 dB).
+  Nếu không nghe thấy: kiểm tra Windows Volume Mixer cho `Godot`/`5joblesS` và
+  đảm bảo chạy từ `Menu.tscn` (F5).
 - Thiết kế chi tiết: [docs/gameplay-plan.md](docs/gameplay-plan.md).
